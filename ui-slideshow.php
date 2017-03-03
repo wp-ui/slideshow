@@ -161,6 +161,11 @@ class WP_UI_Slideshow {
 			if( array_key_exists($option, $atts) )
 				$options[$option] = $atts[$option];
 		}
+		// FIX for timeout passed in seconds
+		if( $options['timeout'] && 100 > $options['timeout'] ){
+			$options['timeout'] = $options['timeout'] * 1000;
+		}
+
 		return $options;
 	}
 	// hidden
