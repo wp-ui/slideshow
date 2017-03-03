@@ -9,6 +9,16 @@
   Author URI: http://makesites.org
  */
 
+// Constants
+// plugin folder url
+if(!defined('UI_SLIDESHOW_URL')) define('UI_SLIDESHOW_URL', plugin_dir_url( __FILE__ ));
+// plugin folder path
+if(!defined('UI_SLIDESHOW_DIR')) define('UI_SLIDESHOW_DIR', plugin_dir_path( __FILE__ ));
+// plugin root file
+if(!defined('UI_SLIDESHOW_FILE')) define('UI_SLIDESHOW_FILE', __FILE__);
+
+ define( 'UI_SLIDESHOW_SETTINGS', 'ui-slideshow' );
+
 $ui_slideshow = new WP_UI_Slideshow();
 
 class WP_UI_Slideshow {
@@ -33,6 +43,11 @@ class WP_UI_Slideshow {
 		//add_action('admin_menu', array($this, 'admin_menu') );
 		add_action('wp_ajax_ui_slideshow_styles', array($this, 'dynamicStyles') );
 		add_action('wp_ajax_nopriv_ui_slideshow_styles', array($this, 'dynamicStyles') );
+
+		if ( is_admin() ){ // admin actions
+			add_action( 'admin_menu', array($this, 'settingsPage') );
+		}
+
 	}
 
 	// generate dynamic styles
@@ -167,6 +182,18 @@ class WP_UI_Slideshow {
 		}
 
 		return $options;
+	}
+
+	function settingsPage() {
+		add_options_page( 'Slideshow', 'Slideshow', 'manage_options', UI_SLIDESHOW_SETTINGS, array($this, 'settingsPageHTML') );
+	}
+
+	function settingsPageHTML(){
+		//$options = get_option( WEBCAL_OPTION_GROUP );
+		ob_start();
+		include( UI_SLIDESHOW_DIR ."views/settings.php");
+		$output = ob_get_clean();
+		echo $output;
 	}
 	// hidden
 
