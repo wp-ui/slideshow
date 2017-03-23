@@ -43,6 +43,8 @@ class WP_UI_Slideshow {
 		//add_action('admin_menu', array($this, 'admin_menu') );
 		add_action('wp_ajax_ui_slideshow_styles', array($this, 'dynamicStyles') );
 		add_action('wp_ajax_nopriv_ui_slideshow_styles', array($this, 'dynamicStyles') );
+		add_action('wp_ajax_ui_slideshow_js', array($this, 'dynamicJS') );
+		add_action('wp_ajax_nopriv_ui_slideshow_js', array($this, 'dynamicJS') );
 
 		if ( is_admin() ){ // admin actions
 			add_action( 'admin_menu', array($this, 'settingsPage') );
@@ -53,10 +55,23 @@ class WP_UI_Slideshow {
 	// generate dynamic styles
 	function dynamicStyles(){
 		header('Content-type: text/css');
-		$params = json_decode( base64_decode( urldecode( $_GET['params'] ) ), true); // error control?
+		$data = json_decode( base64_decode( urldecode( $_GET['data'] ) ), true); // error control?
+		$options = json_decode( base64_decode( urldecode( $_GET['options'] ) ), true); // error control?
 		// split data based on size
-		$params['data'] = $this->_orderSrcset( $params['data'] );
+		$data = $this->_orderSrcset( $data );
+		// render
 		$view = dirname(__FILE__) ."/views/styles.php";
+		include( $view );
+		wp_die();
+		//exit;
+	}
+
+	// generate dynamic logic
+	function dynamicJS(){
+		header('Content-type: application/javascript');
+		$options = json_decode( base64_decode( urldecode( $_GET['options'] ) ), true); // error control?
+		// render
+		$view = dirname(__FILE__) ."/views/js.php";
 		include( $view );
 		wp_die();
 		//exit;
@@ -141,26 +156,27 @@ class WP_UI_Slideshow {
 			'id' => rand(1000, 9999), // unique identifier
 			'view' => "slideshow",
 		), $atts );
+		// define view...
+
 		// get images
 		$data = $this->getImages( $atts['ids'] );
 		// options
 		$options = $this->setOptions( $atts );
-		// queue styles
-		// dynamic styles (use optionally?)
-		$params = urlencode ( base64_encode( json_encode(array(
-			"id" => $attr['id'],
-			"options" => $options,
-			"data" => $data
-		), JSON_NUMERIC_CHECK) ));
-		$styles = admin_url('admin-ajax.php').'?action=ui_slideshow_styles&params='. $params;
-		//wp_enqueue_style('ui-slideshow-styles', admin_url('admin-ajax.php').'?action=ui_slideshow_styles$params='. $params, array(), $this->version, true );
+		$options['el'] = "#ui-slideshow-". $attr['id'];
+		// add touch option if dependency met
+		if( wp_script_is('backbone-input-touch') ) $options['monitor'] = array("touch");
+		// queue styles - dynamic styles (use optionally?)
+		$styles = admin_url('admin-ajax.php').'?action=ui_slideshow_styles&data='. $this->queryParam( $data ) .'&options='. $this->queryParam( $options );
+		$js = admin_url('admin-ajax.php').'?action=ui_slideshow_js&options='. $this->queryParam( $options );
+		// enqueue styles/logic
+		wp_enqueue_style('ui-slideshow-img', $styles, array(), $this->version, 'all' );
+		wp_enqueue_script('ui-slideshow-js-custom', $js, array('jquery'), $this->version, true );
 		// load view
 		// lookup in theme folder (for an override)
 		$view = get_template_directory() ."/views/". $attr['view'] .".php";
 		if( !file_exists( $view ) ){
 			$view = plugin_dir_path( __FILE__ ) ."views/". $attr['view'] .".php"; // assume it exists?
 		}
-
 		ob_start();
 		include( $view );
 		return ob_get_clean();
@@ -236,6 +252,11 @@ class WP_UI_Slideshow {
 		}
 		// second loop to co
 		return $slides;
+	}
+
+	// Helpers
+	function queryParam( $str="" ){
+		return urlencode ( base64_encode( json_encode( $str ) ) );
 	}
 
 }

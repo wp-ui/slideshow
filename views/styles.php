@@ -1,9 +1,7 @@
 /* dynamically generated stylesheet */
 <?php
 // variables
-$id = $params['id'];
-$el = "#ui-slideshow-$id";
-
+$el = $options['el'];
 ?>
 
 /* Media queries */
@@ -13,7 +11,7 @@ $el = "#ui-slideshow-$id";
 
 	/* 1600 px */
 
-	<?php foreach($params['data'] as $i => $slide ) { ?>
+	<?php foreach( $data as $i => $slide ) { ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
 		background-image: url(<?php echo $slide[1600] ?>);
@@ -26,7 +24,7 @@ $el = "#ui-slideshow-$id";
 
 	/* 1024 px */
 
-	<?php foreach($params['data'] as $i => $slide ) { ?>
+	<?php foreach( $data as $i => $slide ) { ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
 		background-image: url(<?php echo $slide[1024] ?>);
@@ -40,7 +38,7 @@ $el = "#ui-slideshow-$id";
 
 	/* 768 px */
 
-	<?php foreach($params['data'] as $i => $slide ) { ?>
+	<?php foreach( $data as $i => $slide ) { ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
 		background-image: url(<?php echo $slide[768] ?>);

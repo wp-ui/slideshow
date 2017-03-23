@@ -1,11 +1,7 @@
 <?php
+	// available context: $attr, $options
 	// variables
-	$id = $attr['id'];
-	$target = "ui-slideshow-$id";
-	$fn = "UISlideshow_$id";
-	$options['el'] = "#$target";
-	// add touch option if dependency met
-	if( wp_script_is('backbone-input-touch') ) $options['monitor'] = array("touch");
+	$target = "ui-slideshow-". $attr['id'];
 ?>
 <?php
 	// display error(s)
@@ -13,7 +9,6 @@
 		echo '<div class="error">'. $_SESSION['ui_slideshow_error'] .'</div>';
 	}
 ?>
-
 <div id="<?php echo $target ?>" class="ui-slideshow no-captions">
 	<a class="prev arrow"></a>
 	<a class="next arrow"></a>
@@ -30,13 +25,3 @@
 	<?php } ?>
 	</div>
 </div>
-<!-- styles -->
-<link rel="stylesheet" id="ui-slideshow-styles" href="<?php echo $styles ?>" type="text/css" media="all">
-<!-- logic -->
-<script type="text/javascript">
-	function <?php echo $fn ?>() {
-		var view = new Backbone.UI.Slideshow(<?php echo json_encode($options, JSON_NUMERIC_CHECK) ?>);
-		view.render();
-	}
-	window.onload = <?php echo $fn ?>;
-</script>
