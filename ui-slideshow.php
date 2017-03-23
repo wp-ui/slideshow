@@ -177,7 +177,7 @@ class WP_UI_Slideshow {
 				$options[$option] = $atts[$option];
 		}
 		// FIX for timeout passed in seconds
-		if( $options['timeout'] && 100 > $options['timeout'] ){
+		if( array_key_exists('timeout', $options) && 100 > $options['timeout'] ){
 			$options['timeout'] = $options['timeout'] * 1000;
 		}
 
