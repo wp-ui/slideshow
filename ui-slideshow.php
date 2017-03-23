@@ -191,9 +191,14 @@ class WP_UI_Slideshow {
 		wp_enqueue_script('ui-slideshow-js-custom', $js, array('jquery'), $this->version, true );
 		// load view
 		// lookup in theme folder (for an override)
-		$view = get_template_directory() ."/views/". $attr['view'] .".php";
+		$view_uri = ( false !== strpos($attr['view'], "/") )
+			? $attr['view'] .".php"
+			: "/views/". $attr['view'] .".php";
+		// FIX: we need a leading slash
+		if( substr($view_uri, 0,1) !== "/" ) $view_uri = "/". $view_uri;
+		$view = get_template_directory() .$view_uri;
 		if( !file_exists( $view ) ){
-			$view = plugin_dir_path( __FILE__ ) ."views/". $attr['view'] .".php"; // assume it exists?
+			$view = plugin_dir_path( __FILE__ ) .$view_uri; // assume it exists?
 		}
 		ob_start();
 		include( $view );
