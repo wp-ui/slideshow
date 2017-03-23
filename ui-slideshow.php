@@ -89,6 +89,7 @@ class WP_UI_Slideshow {
 		wp_enqueue_script( 'ui-slideshow-js', plugins_url( 'assets/js/backbone.ui.slideshow.js', __FILE__ ), array('backbone', 'jquery', 'underscore'), $this->version, true );
 		// register backbone.input.touch optionally (with an option)
 	}
+
 	// data methods
 
 	function getImages( $ids="" ){
@@ -110,6 +111,18 @@ class WP_UI_Slideshow {
 		}
 
 		return $images;
+	}
+
+	function getImagesACF( $key="" ){
+		// variables
+		$ids = array();
+		$field = get_field($key);
+		// convert urls to ids
+		foreach($field as $slide){
+			$ids[] = $this->attachmentID( $slide['image'] );
+		}
+		// normalize data
+		return $this->getImages( $ids );
 	}
 
 	function error( $key ) {
@@ -150,16 +163,21 @@ class WP_UI_Slideshow {
 	// [ui-slideshow view="form" postcode="XX12345"]
 	function shortcode( $atts ) {
 		// prerequisite
-		if( !array_key_exists('ids', $atts) ) return;
+		//if( !array_key_exists('ids', $atts) ) return;
 		//
 		$attr = shortcode_atts( array(
 			'id' => rand(1000, 9999), // unique identifier
 			'view' => "slideshow",
 		), $atts );
 		// define view...
-
 		// get images
-		$data = $this->getImages( $atts['ids'] );
+		if( array_key_exists('acf', $atts)  ){
+			// get the slides from the ACF (default: acf='slides')
+			$data = $this->getImagesACF($atts['acf']);
+		} else {
+			// assume ids exist?
+			$data = $this->getImages( $atts['ids'] );
+		}
 		// options
 		$options = $this->setOptions( $atts );
 		$options['el'] = "#ui-slideshow-". $attr['id'];
@@ -259,6 +277,33 @@ class WP_UI_Slideshow {
 		return urlencode ( base64_encode( json_encode( $str ) ) );
 	}
 
+	// Get the Attachment ID from an Image URL in WordPress
+	// Source: https://philipnewcomer.net/2012/11/get-the-attachment-id-from-an-image-url-in-wordpress/
+	function attachmentID( $url = '' ) {
+		global $wpdb;
+		// prerequisite
+		if ( '' == $url ) return;
+		// variables
+		$id = false;
+		// Get the upload directory paths
+		$upload_dir = wp_upload_dir();
+
+		// Make sure the upload path base directory exists in the attachment URL, to verify that we're working with a media library image
+		if ( false !== strpos( $url, $upload_dir['baseurl'] ) ) {
+
+			// If this is the URL of an auto-generated thumbnail, get the URL of the original image
+			$url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $url );
+
+			// Remove the upload path base directory from the attachment URL
+			$url = str_replace( $upload_dir['baseurl'] . '/', '', $url );
+
+			// Finally, run a custom database query to get the attachment ID from the modified attachment URL
+			$id = $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = '%s' AND wposts.post_type = 'attachment'", $url ) );
+
+		}
+
+		return $id;
+	}
 }
 
 ?>
