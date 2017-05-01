@@ -58,13 +58,13 @@ class WP_UI_Slideshow {
 		// get data
 		$data = array();
 		//$data = json_decode( base64_decode( urldecode( $_GET['data'] ) ), true); // error control?
-		$atts = json_decode( base64_decode( urldecode( $_GET['atts'] ) ), true); // error control?
-		if( array_key_exists('acf', $atts)  ){
+		$params = json_decode( base64_decode( urldecode( $_GET['params'] ) ), true); // error control?
+		if( array_key_exists('acf', $params) ){
 			// get the slides from the ACF (default: acf='slides')
-			$data = $this->getImagesACF($atts['acf']);
+			$data = $this->getImagesACF($params['acf'], $params['post']);
 		} else {
 			// assume ids exist?
-			$data = $this->getImages( $atts['ids'] );
+			$data = $this->getImages( $params['ids'] );
 		}
 		//$options = json_decode( base64_decode( urldecode( $_GET['options'] ) ), true); // error control?
 		// split data based on size
@@ -123,10 +123,10 @@ class WP_UI_Slideshow {
 		return $images;
 	}
 
-	function getImagesACF( $key="" ){
+	function getImagesACF( $key="", $post=false ){
 		// variables
 		$ids = array();
-		$field = get_field($key);
+		$field = ($post) ? get_field($key, $post) : get_field($key);
 		// convert urls to ids
 		foreach($field as $slide){
 			$ids[] = $this->attachmentID( $slide['image'] );
@@ -172,12 +172,16 @@ class WP_UI_Slideshow {
 
 	// [ui-slideshow view="form" postcode="XX12345"]
 	function shortcode( $atts ) {
-		// prerequisite
+		global $post;
+		// prerequisite(s)
 		//if( !array_key_exists('ids', $atts) ) return;
+		if( !isset($post->ID) ) return;
 		// variables
 		$data = array();
-		$attr = shortcode_atts( array(
+		//$atts = shortcode_atts( array(
+		$atts = array_merge( array(
 			'id' => rand(1000, 9999), // unique identifier
+			'post' => $post->ID, // assume it exists?
 			'view' => "slideshow",
 		), $atts );
 		// load data
@@ -188,22 +192,24 @@ class WP_UI_Slideshow {
 			// assume ids exist?
 			$data = $this->getImages( $atts['ids'] );
 		}
+		// soft slide attributes
+		$params = $this->setParams( $atts );
 		// options
 		$options = $this->setOptions( $atts );
-		$options['el'] = "#ui-slideshow-". $attr['id'];
+		$options['el'] = "#ui-slideshow-". $atts['id'];
 		// add touch option if dependency met
 		if( wp_script_is('backbone-input-touch') ) $options['monitor'] = array("touch");
 		// queue styles - dynamic styles (use optionally?)
-		$styles = admin_url('admin-ajax.php').'?action=ui_slideshow_styles&atts='. $this->queryParam( $atts ) .'&options='. $this->queryParam( $options );
+		$styles = admin_url('admin-ajax.php').'?action=ui_slideshow_styles&params='. $this->queryParam( $params ) .'&options='. $this->queryParam( $options );
 		$js = admin_url('admin-ajax.php').'?action=ui_slideshow_js&options='. $this->queryParam( $options );
 		// enqueue styles/logic
 		wp_enqueue_style('ui-slideshow-img', $styles, array(), $this->version, 'all' );
 		wp_enqueue_script('ui-slideshow-js-custom', $js, array('jquery'), $this->version, true );
 		// load view
 		// lookup in theme folder (for an override)
-		$view_uri = ( false !== strpos($attr['view'], "/") )
-			? $attr['view'] .".php"
-			: "/views/". $attr['view'] .".php";
+		$view_uri = ( false !== strpos($atts['view'], "/") )
+			? $atts['view'] .".php"
+			: "/views/". $atts['view'] .".php";
 		// FIX: we need a leading slash
 		if( substr($view_uri, 0,1) !== "/" ) $view_uri = "/". $view_uri;
 		$view = get_template_directory() .$view_uri;
@@ -231,6 +237,20 @@ class WP_UI_Slideshow {
 		}
 
 		return $options;
+	}
+
+	function setParams( $atts=array() ){
+		// variables
+		$params = array();
+		// supporting:
+		$keys = array('ids', 'acf', 'post');
+		//
+		foreach($keys as $param){
+			if( array_key_exists($param, $atts) )
+				$params[$param] = $atts[$param];
+		}
+
+		return $params;
 	}
 
 	function settingsPage() {

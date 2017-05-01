@@ -1,7 +1,7 @@
 <?php
-	// available context: $attr, $options
+	// available context: $atts, $options
 	// variables
-	$target = "ui-slideshow-". $attr['id'];
+	$target = "ui-slideshow-". $atts['id'];
 ?>
 <?php
 	// display error(s)
