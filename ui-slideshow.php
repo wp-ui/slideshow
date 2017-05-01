@@ -55,8 +55,18 @@ class WP_UI_Slideshow {
 	// generate dynamic styles
 	function dynamicStyles(){
 		header('Content-type: text/css');
-		$data = json_decode( base64_decode( urldecode( $_GET['data'] ) ), true); // error control?
-		$options = json_decode( base64_decode( urldecode( $_GET['options'] ) ), true); // error control?
+		// get data
+		$data = array();
+		//$data = json_decode( base64_decode( urldecode( $_GET['data'] ) ), true); // error control?
+		$atts = json_decode( base64_decode( urldecode( $_GET['atts'] ) ), true); // error control?
+		if( array_key_exists('acf', $atts)  ){
+			// get the slides from the ACF (default: acf='slides')
+			$data = $this->getImagesACF($atts['acf']);
+		} else {
+			// assume ids exist?
+			$data = $this->getImages( $atts['ids'] );
+		}
+		//$options = json_decode( base64_decode( urldecode( $_GET['options'] ) ), true); // error control?
 		// split data based on size
 		$data = $this->_orderSrcset( $data );
 		// render
@@ -164,13 +174,13 @@ class WP_UI_Slideshow {
 	function shortcode( $atts ) {
 		// prerequisite
 		//if( !array_key_exists('ids', $atts) ) return;
-		//
+		// variables
+		$data = array();
 		$attr = shortcode_atts( array(
 			'id' => rand(1000, 9999), // unique identifier
 			'view' => "slideshow",
 		), $atts );
-		// define view...
-		// get images
+		// load data
 		if( array_key_exists('acf', $atts)  ){
 			// get the slides from the ACF (default: acf='slides')
 			$data = $this->getImagesACF($atts['acf']);
@@ -184,7 +194,7 @@ class WP_UI_Slideshow {
 		// add touch option if dependency met
 		if( wp_script_is('backbone-input-touch') ) $options['monitor'] = array("touch");
 		// queue styles - dynamic styles (use optionally?)
-		$styles = admin_url('admin-ajax.php').'?action=ui_slideshow_styles&data='. $this->queryParam( $data ) .'&options='. $this->queryParam( $options );
+		$styles = admin_url('admin-ajax.php').'?action=ui_slideshow_styles&atts='. $this->queryParam( $atts ) .'&options='. $this->queryParam( $options );
 		$js = admin_url('admin-ajax.php').'?action=ui_slideshow_js&options='. $this->queryParam( $options );
 		// enqueue styles/logic
 		wp_enqueue_style('ui-slideshow-img', $styles, array(), $this->version, 'all' );
