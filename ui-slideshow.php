@@ -4,7 +4,7 @@
   Plugin Name: UI: Slideshow
   Plugin URI: https://github.com/backbone-ui/slideshow
   Description: Create a slideshow from your gallery images
-  Version: 1.0
+  Version: 1.0.0
   Author: Makesites
   Author URI: http://makesites.org
  */
@@ -150,7 +150,7 @@ class WP_UI_Slideshow {
 	// finds the aspect ratio of an image
 	function ratio( $src ){
 		// regular expression
-		$pattern = '/-[0-9]*x[0-9]*./';
+		$pattern = '/-[0-9]*x[0-9]*.\./'; //'/-[0-9]*x[0-9]*./';
 		preg_match($pattern, $src, $matches, PREG_OFFSET_CAPTURE);
 		if( !isset( $matches[0][0] ) ) return 0;
 		$dimensions = substr($matches[0][0], 1, -1);
@@ -228,8 +228,11 @@ class WP_UI_Slideshow {
 		$keys = array('autoplay', 'autoloop', 'timeout', 'width', 'height');
 		//
 		foreach($keys as $option){
-			if( array_key_exists($option, $atts) )
-				$options[$option] = $atts[$option];
+			if( !array_key_exists($option, $atts) ) continue;
+			$options[$option] = $atts[$option];
+			// FIX: convert boolean
+			if( filter_var($options[$option], FILTER_VALIDATE_BOOLEAN) ||  strtolower($options[$option]) == "false" )
+				$options[$option] = filter_var($options[$option], FILTER_VALIDATE_BOOLEAN);// use settype instead?
 		}
 		// FIX for timeout passed in seconds
 		if( array_key_exists('timeout', $options) && 100 > $options['timeout'] ){
@@ -314,31 +317,34 @@ class WP_UI_Slideshow {
 
 	// Get the Attachment ID from an Image URL in WordPress
 	// Source: https://philipnewcomer.net/2012/11/get-the-attachment-id-from-an-image-url-in-wordpress/
-	function attachmentID( $url = '' ) {
+	function attachmentID( $url = '', $thumbnail=false ) {
 		global $wpdb;
 		// prerequisite
 		if ( '' == $url ) return;
 		// variables
 		$id = false;
+		$attachment = false;
 		// Get the upload directory paths
 		$upload_dir = wp_upload_dir();
 
 		// Make sure the upload path base directory exists in the attachment URL, to verify that we're working with a media library image
 		if ( false !== strpos( $url, $upload_dir['baseurl'] ) ) {
+			// Remove the upload path base directory from the attachment URL
+			$attachment = str_replace( $upload_dir['baseurl'] . '/', '', $url );
 
 			// If this is the URL of an auto-generated thumbnail, get the URL of the original image
-			$url = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $url );
-
-			// Remove the upload path base directory from the attachment URL
-			$url = str_replace( $upload_dir['baseurl'] . '/', '', $url );
+			if( $thumbnail ) $attachment = preg_replace( '/-\d+x\d+(?=\.(jpg|jpeg|png|gif)$)/i', '', $attachment );
 
 			// Finally, run a custom database query to get the attachment ID from the modified attachment URL
-			$id = $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = '%s' AND wposts.post_type = 'attachment'", $url ) );
+			$id = $wpdb->get_var( $wpdb->prepare( "SELECT wposts.ID FROM $wpdb->posts wposts, $wpdb->postmeta wpostmeta WHERE wposts.ID = wpostmeta.post_id AND wpostmeta.meta_key = '_wp_attached_file' AND wpostmeta.meta_value = '%s' AND wposts.post_type = 'attachment'", $attachment ) );
 
+			// FIX: if we didn't find an id try again by removing the thumbnail extension
+			if( is_null($id) && !$thumbnail ) return $this->attachmentID($url, true);
 		}
 
 		return $id;
 	}
+
 }
 
 ?>
