@@ -30,5 +30,5 @@ An answer to that question.
 2. screenshot-2
 
 == Changelog ==
-= Version 1.0 (15-07-2016) =
+= Version 1.0.0 (30-04-2017) =
 *  Initial release.
