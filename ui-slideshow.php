@@ -225,7 +225,7 @@ class WP_UI_Slideshow {
 	function setOptions( $atts=array() ){
 		$options = array();
 		// supporting:
-		$keys = array('autoplay', 'autoloop', 'timeout', 'width', 'height');
+		$keys = array('autoplay', 'autoloop', 'timeout', 'width', 'height', 'direction');
 		//
 		foreach($keys as $option){
 			if( !array_key_exists($option, $atts) ) continue;
