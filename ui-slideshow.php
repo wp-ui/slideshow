@@ -188,9 +188,12 @@ class WP_UI_Slideshow {
 		if( array_key_exists('acf', $atts)  ){
 			// get the slides from the ACF (default: acf='slides')
 			$data = $this->getImagesACF($atts['acf']);
-		} else {
-			// assume ids exist?
+		} else if( array_key_exists('ids', $atts) ){
+			// use image ids
 			$data = $this->getImages( $atts['ids'] );
+		} else {
+			// assume the data will be resourced some other way
+			$data = null;
 		}
 		// soft slide attributes
 		$params = $this->setParams( $atts );
