@@ -4,7 +4,7 @@
   Plugin Name: UI: Slideshow
   Plugin URI: https://github.com/backbone-ui/slideshow
   Description: Create a slideshow from your gallery images
-  Version: 1.2.0
+  Version: 1.2.1
   Author: Makesites
   Author URI: http://makesites.org
  */
@@ -206,8 +206,8 @@ class WP_UI_Slideshow {
 		$styles = admin_url('admin-ajax.php').'?action=ui_slideshow_styles&params='. $this->queryParam( $params ) .'&options='. $this->queryParam( $options );
 		$js = admin_url('admin-ajax.php').'?action=ui_slideshow_js&options='. $this->queryParam( $options );
 		// enqueue styles/logic
-		wp_enqueue_style('ui-slideshow-img', $styles, array(), $this->version, 'all' );
-		wp_enqueue_script('ui-slideshow-js-custom', $js, array('jquery'), $this->version, true );
+		wp_enqueue_style('ui-slideshow-img-'.$atts['id'], $styles, array(), $this->version, 'all' );
+		wp_enqueue_script('ui-slideshow-js-custom-'.$atts['id'], $js, array('jquery'), $this->version, true );
 		// load view
 		// lookup in theme folder (for an override)
 		$view_uri = ( false !== strpos($atts['view'], "/") )
