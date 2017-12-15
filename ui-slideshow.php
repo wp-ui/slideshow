@@ -17,9 +17,7 @@ if(!defined('UI_SLIDESHOW_DIR')) define('UI_SLIDESHOW_DIR', plugin_dir_path( __F
 // plugin root file
 if(!defined('UI_SLIDESHOW_FILE')) define('UI_SLIDESHOW_FILE', __FILE__);
 
- define( 'UI_SLIDESHOW_SETTINGS', 'ui-slideshow' );
-
-$ui_slideshow = new WP_UI_Slideshow();
+define( 'UI_SLIDESHOW_SETTINGS', 'ui-slideshow' );
 
 class WP_UI_Slideshow {
 
@@ -28,10 +26,9 @@ class WP_UI_Slideshow {
 
 	function __construct() {
 
-		// hooks
-		add_action( 'wp_enqueue_scripts', array($this, 'loadAssets') );
-		//add_action( 'plugins_loaded', array($this, 'db_check') );
 		add_shortcode( 'ui-slideshow', array($this, 'shortcode') );
+		// hooks
+		//add_action( 'plugins_loaded', array($this, 'db_check') );
 		// Use init to act on $_POST data:
 		//add_action( 'init', array($this, 'process_post') );
 		// session
@@ -49,6 +46,8 @@ class WP_UI_Slideshow {
 		if ( is_admin() ){ // admin actions
 			add_action( 'admin_menu', array($this, 'settingsPage') );
 		}
+		// execute after the theme is loaded to let the plugin be "aware" of the other deps
+		add_action( 'wp_enqueue_scripts', array($this, 'loadAssets'), 999 );
 
 	}
 
@@ -59,6 +58,7 @@ class WP_UI_Slideshow {
 		$data = array();
 		//$data = json_decode( base64_decode( urldecode( $_GET['data'] ) ), true); // error control?
 		$params = json_decode( base64_decode( urldecode( $_GET['params'] ) ), true); // error control?
+		$options = json_decode( base64_decode( urldecode( $_GET['options'] ) ), true); // error control?
 		if( array_key_exists('acf', $params) ){
 			// get the slides from the ACF (default: acf='slides')
 			$data = $this->getImagesACF($params['acf'], $params['post']);
@@ -92,11 +92,17 @@ class WP_UI_Slideshow {
 		// styles
 		wp_enqueue_style( 'ui-slideshow', plugins_url( 'assets/css/backbone.ui.slideshow.css', __FILE__ ), array(), $this->version );
 		// deps
+		$deps = array('backbone', 'jquery', 'underscore');
+		// add them if needed
 		if( !wp_script_is('underscore') && !wp_script_is('underscorejs') ) wp_enqueue_script( 'underscore', "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js", array(), "1.8.3", true );
 		if( !wp_script_is('backbone') && !wp_script_is('backbonejs')) wp_enqueue_script( 'backbone', "//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js", array('underscore'), "1.1.2", true );
 		if( !wp_script_is('jquery') ) wp_enqueue_script( 'jquery', "//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js", array(), "3.1.0", true );
-		// script
-		wp_enqueue_script( 'ui-slideshow-js', plugins_url( 'assets/js/backbone.ui.slideshow.js', __FILE__ ), array('backbone', 'jquery', 'underscore'), $this->version, true );
+		// check for additional deps
+		if( wp_script_is('backbone-input-touch') ) $deps[] = 'backbone-input-touch';
+		if( wp_script_is('backbone-input-mouse') ) $deps[] = 'backbone-input-mouse';
+
+		// main lib
+		wp_enqueue_script( 'ui-slideshow-js', plugins_url( 'assets/js/backbone.ui.slideshow.js', __FILE__ ), $deps, $this->version, true );
 		// register backbone.input.touch optionally (with an option)
 	}
 
@@ -228,7 +234,7 @@ class WP_UI_Slideshow {
 	function setOptions( $atts=array() ){
 		$options = array();
 		// supporting:
-		$keys = array('autoplay', 'autoloop', 'timeout', 'width', 'height', 'direction');
+		$keys = array('autoplay', 'autoloop', 'timeout', 'width', 'height', 'direction', 'draggable');
 		//
 		foreach($keys as $option){
 			if( !array_key_exists($option, $atts) ) continue;
@@ -349,5 +355,11 @@ class WP_UI_Slideshow {
 	}
 
 }
+
+//function ui_slideshow_init(){
+	$ui_slideshow = new WP_UI_Slideshow();
+//}
+//add_action('wp_init', 'ui_slideshow_init', 5);
+
 
 ?>
