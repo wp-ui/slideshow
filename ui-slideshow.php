@@ -117,12 +117,22 @@ class WP_UI_Slideshow {
 		foreach( $ids as $image_id ){
 			$attachment = get_post( $image_id, 'ARRAY_A' );
 			// $src = wp_get_attachment_image_srcset( $image_id, ['768px', '1024px', '1600px'] );
-			$src = wp_get_attachment_image_srcset( $image_id, array(768, 1024, 1600) );
+			$src = wp_get_attachment_image_srcset( $image_id, $this->imgSizes );
+			// FIX: fallback to the original (smaller?) image
+			if( !$src ){
+				$src = wp_get_attachment_image_src($image_id, "full");
+				$ratio = $src[1] / $src[2];
+				// use the smallest of the supported image sizes
+				$src = $src[0] . " ". $this->imgSizes[0] ."w";
+			} else {
+				$ratio = $this->ratio( $src );
+			}
+			//
 			$excerpt = htmlspecialchars($attachment['post_excerpt']);
 			array_push( $images, array(
 				'src' => $src,
 				'excerpt' => $excerpt,
-				'ratio' => $this->ratio( $src )
+				'ratio' => $ratio
 			));
 		}
 
@@ -176,7 +186,7 @@ class WP_UI_Slideshow {
 		session_destroy ();
 	}
 
-	// [ui-slideshow view="form" postcode="XX12345"]
+	// [ui-slideshow view="views/custom-slideshow"]
 	function shortcode( $atts ) {
 		global $post;
 		// prerequisite(s)
@@ -225,6 +235,7 @@ class WP_UI_Slideshow {
 		if( !file_exists( $view ) ){
 			$view = plugin_dir_path( __FILE__ ) .$view_uri; // assume it exists?
 		}
+
 		ob_start();
 		include( $view );
 		return ob_get_clean();
@@ -300,8 +311,11 @@ class WP_UI_Slideshow {
 			if( count($slide) !== count($sizes) ){
 				foreach($sizes as $size ){
 					if( array_key_exists($size, $slide)  ) continue; // no problem
-					// get the image that's closest in dimensions
-					$select = array("image"=>"", "size"=>0, "size"=>0 );
+					// get the image that's closest in dimensions - start with the first (smallest?)
+					reset($images);
+					$min_size = key($images);
+					$select = array("image"=> $images[$min_size], "size"=> $min_size );
+					//
 					foreach($images as $i => $image ){
 						if( abs($i - $size) > abs($i - $select['size']) ) continue;
 						$select = array(
@@ -330,6 +344,8 @@ class WP_UI_Slideshow {
 		global $wpdb;
 		// prerequisite
 		if ( '' == $url ) return;
+		// exit now if we've saved the whole image object
+		if( is_array($url) && array_key_exists('ID', $url) ) return $url['ID'];
 		// variables
 		$id = false;
 		$attachment = false;
