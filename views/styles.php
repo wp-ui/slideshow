@@ -12,6 +12,7 @@ $el = $options['el'];
 	/* 1600 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
+		<?php if( empty($slide[1600]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
 		background-image: url(<?php echo $slide[1600] ?>);
@@ -25,6 +26,7 @@ $el = $options['el'];
 	/* 1024 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
+		<?php if( empty($slide[1024]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
 		background-image: url(<?php echo $slide[1024] ?>);
@@ -38,6 +40,7 @@ $el = $options['el'];
 	/* 768 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
+		<?php if( empty($slide[1024]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
 		background-image: url(<?php echo $slide[1024] ?>);
@@ -51,9 +54,10 @@ $el = $options['el'];
 	/* 768 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
+		<?php if( empty($slide[768]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
-		background-image: url(<?php echo $slide[768] ?>);
+		background-image: url(<?php echo $slide[1024] ?>);
 	}
 	<?php } ?>
 
@@ -64,9 +68,10 @@ $el = $options['el'];
 	/* 400 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
+		<?php if( empty($slide[768]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
-		background-image: url(<?php echo $slide[400] ?>);
+		background-image: url(<?php echo $slide[768] ?>);
 	}
 	<?php } ?>
 
