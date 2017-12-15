@@ -4,7 +4,7 @@
   Plugin Name: UI: Slideshow
   Plugin URI: https://github.com/backbone-ui/slideshow
   Description: Create a slideshow from your gallery images
-  Version: 1.3.0
+  Version: 1.4.0
   Author: Makesites
   Author URI: http://makesites.org
  */
