@@ -139,16 +139,35 @@ class WP_UI_Slideshow {
 		return $images;
 	}
 
-	function getImagesACF( $key="", $post=false ){
+	function getImagesACF( $attr="", $post=false ){
 		// variables
+		$slides = array();
 		$ids = array();
-		$field = ($post) ? get_field($key, $post) : get_field($key);
+		// find the key's nesting
+		$keys = explode("::", $attr);
+		// only support one nesting level
+		if( count($keys) == 1 ){
+			$key = $keys[0];
+			$slides = ($post) ? get_field($key, $post) : get_field($key);
+		} else {
+			if( have_rows($keys[0]) ){
+				while( have_rows($keys[0]) ): the_row();
+				$key = $keys[1];
+				$slides = ($post) ? get_sub_field($key, $post) : get_sub_field($key);
+				endwhile;
+			}
+		}
 		// convert urls to ids
-		foreach($field as $slide){
+		foreach($slides as $slide){
 			$ids[] = $this->attachmentID( $slide['image'] );
 		}
 		// normalize data
-		return $this->getImages( $ids );
+		$images = $this->getImages( $ids );
+		// blend data
+		foreach( $slides as $k=>$v ){
+			$slides[$k] = array_merge($v, $images[$k]);
+		}
+		return $slides;
 	}
 
 	function error( $key ) {
@@ -245,7 +264,7 @@ class WP_UI_Slideshow {
 	function setOptions( $atts=array() ){
 		$options = array();
 		// supporting:
-		$keys = array('autoplay', 'autoloop', 'timeout', 'width', 'height', 'direction', 'draggable');
+		$keys = array('autoplay', 'autoloop', 'timeout', 'width', 'height', 'direction', 'draggable', 'lazyload');
 		//
 		foreach($keys as $option){
 			if( !array_key_exists($option, $atts) ) continue;
