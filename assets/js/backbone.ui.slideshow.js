@@ -73,6 +73,7 @@
 			draggable: false,
 			dragspeed: 1,
 			monitor: View.prototype.options.monitor || [],
+			lazyload: false,
 			timeout: 2000,
 			legacyStyles: false
 		},
@@ -114,6 +115,7 @@
 				return this.parent('render');
 			} else {
 				this.preRender();
+				if( this.options.lazyload ) this.lazyRender();
 				this.postRender();
 			}
 		},
@@ -139,13 +141,35 @@
 			}
 		},
 
+		lazyRender: function(){
+			var self = this;
+			//console.log( this.data );
+			var id = $(this.el).attr('id');
+			// add observers for every slide
+			var observer = new IntersectionObserver( this.checkSlideContent.bind(this) );
+
+			// attach observer to each slide
+			$(this.el).find( this.options.slideClass ).each(function(){
+				// store content
+				var slide = $(this).data('slide');
+				var html = $(this).html();
+				// FIX: clean content comments
+				html = html.replace("<!--", "").replace("-->", "");
+				// save content in cache - only the first every time
+				store.set(id +"-slide-"+ slide, html);
+				$(this).html("");
+				// start observing
+				observer.observe( this );
+			});
+		},
+
 		postRender: function(){
 			var self = this;
 			// add plugin classes
 			$(this.el).addClass("ui-slideshow");
 			$(this.el).find( this.options.slideClass ).addClass("ui-slideshow-slide");
 			// validate the number of slides (with what's rendered)
-			if(  $(this.el).find( this.options.slideClass ).length !== this.options.slides ) this.options.slides = $(this.el).find( this.options.slideClass ).length;
+			if( $(this.el).find( this.options.slideClass ).length !== this.options.slides ) this.options.slides = $(this.el).find( this.options.slideClass ).length;
 			// render slide dimensions as a number
 			this.options.width = this._getSize(this.options.width, $(this.el).width() );
 			this.options.height = this._getSize(this.options.height, $(this.el).height() );
@@ -169,6 +193,40 @@
 			}
 		},
 
+		// checks if the slide has its content displayed
+		checkSlideContent: function(changes){
+			// if content is loaded we're fine
+			var id = $(this.el).attr('id');
+
+			// else load content from cache
+
+			// remove content from slides that are not adjacent
+
+			// 2. For each image that we want to change
+			changes.forEach(e => {
+				//
+				var slide = $(e.target).data('slide');
+				//
+				if( e.isIntersecting ){
+					// load content
+					var content = store.get(id +"-slide-"+ slide);
+					$(e.target).html(content);
+				} else {
+					// remove content
+					var html = $(e.target).html();
+					// FIX: clean content comments
+					//html = html.replace("<!--", "").replace("-->", "");
+					// save // save content in cache - only the first every time
+					//if( !store.check(id +"-slide-"+ slide) )
+					//	store.set(id +"-slide-"+ slide, html);
+					$(e.target).html("");
+				}
+				// * Stop observing the current target
+				//observer.unobserve(change.target);
+			});
+		},
+
+		// Events
 		clickPrev: function( e ){
 			e.preventDefault();
 			var current = this.state.get('current') || 1;
@@ -577,6 +635,32 @@
 		}
 
 	});
+
+// tempStorage with fallback in memory :P
+var store = {
+	data: {},
+	get : function( name ) {
+			return (typeof sessionStorage != "undefined")
+				? sessionStorage.getItem( name )
+				: store.data[name];
+	},
+	set : function( name, val ){
+		return (typeof sessionStorage != "undefined")
+			? sessionStorage.setItem( name, val )
+			: (store.data[name] = val);
+	},
+	del: function( name ){
+		return (typeof sessionStorage != "undefined")
+			? sessionStorage.removeItem( name )
+			: (delete store.data[name]);
+	},
+	check : function( name ){
+		var item = (typeof sessionStorage != "undefined")
+			? sessionStorage.getItem( name )
+			: store.data[name];
+			return ( item !== null );
+	}
+}
 
 	// update Backbone namespace regardless
 	Backbone.UI = Backbone.UI ||{};
