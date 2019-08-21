@@ -213,6 +213,8 @@
 					var content = store.get(id +"-slide-"+ slide);
 
 					$el.html(content);
+					// add slide slideClass
+					if( !$el.hasClass("slide-"+slide) ) $el.addClass("slide-"+slide);
 				} else {
 					// remove content
 					var html = $el.html();
