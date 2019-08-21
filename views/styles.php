@@ -6,8 +6,23 @@ $el = $options['el'];
 
 /* Media queries */
 
-/* everything above wide screen */
-@media screen and (min-width: 1200px) {
+/* Ultra-wide, retina and above */
+@media screen and (min-width: 1921px) {
+
+	/* 2800 px */
+
+	<?php foreach( $data as $i => $slide ) { ?>
+		<?php if( empty($slide[2800]) ) continue; ?>
+	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
+	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
+		background-image: url(<?php echo $slide[2800] ?>);
+	}
+	<?php } ?>
+
+}
+
+/* Full HD */
+@media screen and (min-width: 1201px) and (max-width: 1920px) {
 
 	/* 1600 px */
 
