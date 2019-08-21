@@ -205,21 +205,23 @@
 			// 2. For each image that we want to change
 			changes.forEach(e => {
 				//
-				var slide = $(e.target).data('slide');
+				var $el = $(e.target);
+				var slide = $el.data('slide');
 				//
 				if( e.isIntersecting ){
 					// load content
 					var content = store.get(id +"-slide-"+ slide);
-					$(e.target).html(content);
+
+					$el.html(content);
 				} else {
 					// remove content
-					var html = $(e.target).html();
+					var html = $el.html();
 					// FIX: clean content comments
 					//html = html.replace("<!--", "").replace("-->", "");
 					// save // save content in cache - only the first every time
 					//if( !store.check(id +"-slide-"+ slide) )
 					//	store.set(id +"-slide-"+ slide, html);
-					$(e.target).html("");
+					$el.html("");
 				}
 				// * Stop observing the current target
 				//observer.unobserve(change.target);
