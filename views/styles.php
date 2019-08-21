@@ -23,7 +23,7 @@ $el = $options['el'];
 
 @media screen and (min-width: 1025px) and (max-width: 1200px) {
 
-	/* 1024 px */
+	/* 1200 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
 		<?php if( empty($slide[1024]) ) continue; ?>
@@ -37,7 +37,7 @@ $el = $options['el'];
 
 @media screen and (min-width: 800px) and (max-width: 1024px) {
 
-	/* 768 px */
+	/* 1024 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
 		<?php if( empty($slide[1024]) ) continue; ?>
@@ -51,10 +51,10 @@ $el = $options['el'];
 
 @media screen and (min-width: 500px ) and (max-width: 799px ) {
 
-	/* 768 px */
+	/* 800 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
-		<?php if( empty($slide[768]) ) continue; ?>
+		<?php if( empty($slide[1024]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
 		background-image: url(<?php echo $slide[1024] ?>);
@@ -65,7 +65,7 @@ $el = $options['el'];
 
 @media screen and (max-width: 499px ) {
 
-	/* 400 px */
+	/* 500 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
 		<?php if( empty($slide[768]) ) continue; ?>
