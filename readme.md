@@ -19,6 +19,7 @@ Simple slideshows for your Wordpress site, using shortcodes. Supports data from 
 The plugin creates the shortcode _ui-slideshow_ which you can enter in your content, for example: 
 ```
 [ui-slideshow ids="23,63,12,57" autoplay="true" autoloop="true" lazyload="true" timeout="4" view="slideshow"]
+```
 
 
 ## Params
