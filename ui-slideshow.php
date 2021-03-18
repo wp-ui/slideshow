@@ -121,9 +121,15 @@ class WP_UI_Slideshow {
 			// FIX: fallback to the original (smaller?) image
 			if( !$src ){
 				$src = wp_get_attachment_image_src($image_id, "full");
-				$ratio = $src[1] / $src[2];
-				// use the smallest of the supported image sizes
-				$src = $src[0] . " ". $this->imgSizes[0] ."w";
+				// fix to prevent error "division by zero" - check if $src[1] and $src[2] exist
+				if ( is_array($src) && array_key_exists(1, $src) && array_key_exists(2, $src) ) {
+					$ratio = $src[1] / $src[2];
+					// use the smallest of the supported image sizes
+					$src = $src[0] . " ". $this->imgSizes[0] ."w";
+				} else {
+					// fallback if $src returns false
+					$ratio = $this->ratio( $src );
+				}
 			} else {
 				$ratio = $this->ratio( $src );
 			}
@@ -190,7 +196,9 @@ class WP_UI_Slideshow {
 		if( !isset( $matches[0][0] ) ) return 0;
 		$dimensions = substr($matches[0][0], 1, -1);
 		$sizes = explode("x", $dimensions); // assume "x" exists?
-		return $sizes[0]/$sizes[1];
+		$ratio = $sizes[0]/$sizes[1];
+		// fallback?
+		return $ratio;
 	}
 
 	function sessionStart() {
