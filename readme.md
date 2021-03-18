@@ -18,7 +18,7 @@ Simple slideshows for your Wordpress site, using shortcodes. Supports data from 
 
 The plugin creates the shortcode _ui-slideshow_ which you can enter in your content, for example: 
 ```
-[ui-slideshow ids="23,63,12,57" autoplay="true" autoloop="true" lazyload="true" timeout="4" view="partials/slideshow"]
+[ui-slideshow ids="23,63,12,57" autoplay="true" autoloop="true" lazyload="true" timeout="4" view="slideshow"]
 
 
 ## Params
@@ -27,7 +27,8 @@ The plugin creates the shortcode _ui-slideshow_ which you can enter in your cont
 * **ids**: Comma-separated numbers of the ids of gallery assets
 * **post**: Specify a different post (than the current page) to get the assets from
 * **randomize**: The slide order is randomized onload
-* **view**: Override the default rendering with your own custom view fragment. 
+* **view**: Override the default rendering with your own custom view fragment
+
 
 ## Options
 
