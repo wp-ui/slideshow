@@ -12,13 +12,13 @@ if($randomize) shuffle($data);
 /* Ultra-wide, retina and above */
 @media screen and (min-width: 1921px) {
 
-	/* 2800 px */
+	/* 3200 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
-		<?php if( empty($slide[2800]) ) continue; ?>
+		<?php if( empty($slide[3200]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
-		background-image: url(<?php echo $slide[2800] ?>);
+		background-image: url(<?php echo $slide[3200] ?>);
 	}
 	<?php } ?>
 
@@ -27,33 +27,19 @@ if($randomize) shuffle($data);
 /* Full HD */
 @media screen and (min-width: 1201px) and (max-width: 1920px) {
 
-	/* 1600 px */
-
-	<?php foreach( $data as $i => $slide ) { ?>
-		<?php if( empty($slide[1600]) ) continue; ?>
-	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
-	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
-		background-image: url(<?php echo $slide[1600] ?>);
-	}
-	<?php } ?>
-
-}
-
-@media screen and (min-width: 1025px) and (max-width: 1200px) {
-
 	/* 1200 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
-		<?php if( empty($slide[1024]) ) continue; ?>
+		<?php if( empty($slide[1200]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
-		background-image: url(<?php echo $slide[1024] ?>);
+		background-image: url(<?php echo $slide[1200] ?>);
 	}
 	<?php } ?>
 
 }
 
-@media screen and (min-width: 800px) and (max-width: 1024px) {
+@media screen and (min-width: 800px) and (max-width: 1200px) {
 
 	/* 1024 px */
 
@@ -72,10 +58,10 @@ if($randomize) shuffle($data);
 	/* 800 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
-		<?php if( empty($slide[1024]) ) continue; ?>
+		<?php if( empty($slide[800]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
-		background-image: url(<?php echo $slide[1024] ?>);
+		background-image: url(<?php echo $slide[800] ?>);
 	}
 	<?php } ?>
 
@@ -83,13 +69,13 @@ if($randomize) shuffle($data);
 
 @media screen and (max-width: 499px ) {
 
-	/* 500 px */
+	/* 400 px */
 
 	<?php foreach( $data as $i => $slide ) { ?>
-		<?php if( empty($slide[768]) ) continue; ?>
+		<?php if( empty($slide[400]) ) continue; ?>
 	/*<?php echo $el ?> .slide:nth-child(<?php echo ($i+1); ?>) { */
 	<?php echo $el ?> .slide-<?php echo ($i+1); ?> {
-		background-image: url(<?php echo $slide[768] ?>);
+		background-image: url(<?php echo $slide[400] ?>);
 	}
 	<?php } ?>
 

@@ -22,7 +22,7 @@ define( 'UI_SLIDESHOW_SETTINGS', 'ui-slideshow' );
 class WP_UI_Slideshow {
 
 	protected $version = "1.2"; // pickup version from package.json
-	protected $imgSizes = array(768, 1024, 1600, 2800);
+	protected $imgSizes = array(400, 800, 1024, 1200, 3200);
 
 	function __construct() {
 
