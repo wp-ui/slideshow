@@ -26,6 +26,7 @@ The plugin creates the shortcode _ui-slideshow_ which you can enter in your cont
 * **acf**: A custom field created on the post, containing a list of gallery assets 
 * **ids**: Comma-separated numbers of the ids of gallery assets
 * **post**: Specify a different post (than the current page) to get the assets from
+* **randomize**: The slide order is randomized onload
 * **view**: Override the default rendering with your own custom view fragment. 
 
 ## Options

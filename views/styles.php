@@ -2,6 +2,9 @@
 <?php
 // variables
 $el = $options['el'];
+// randomize data if param set
+$randomize = (array_key_exists("randomize", $params)) ? (bool)$params['randomize'] : false;
+if($randomize) shuffle($data);
 ?>
 
 /* Media queries */

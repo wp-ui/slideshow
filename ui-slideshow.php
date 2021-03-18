@@ -285,7 +285,7 @@ class WP_UI_Slideshow {
 		// variables
 		$params = array();
 		// supporting:
-		$keys = array('ids', 'acf', 'post');
+		$keys = array('ids', 'acf', 'post', 'randomize');
 		//
 		foreach($keys as $param){
 			if( array_key_exists($param, $atts) )
