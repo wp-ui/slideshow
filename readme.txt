@@ -30,5 +30,10 @@ An answer to that question.
 2. screenshot-2
 
 == Changelog ==
+= Version 1.6.0 (17-03-2021) =
+* + param: randomize
+* changing image sizes and media query brackets
+* fix: data error "division by zero"
+...
 = Version 1.0.0 (30-04-2017) =
 *  Initial release.

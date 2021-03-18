@@ -1,6 +1,6 @@
 {
 	"name": "makesites/wp-ui-slideshow",
-	"version": "1.4.0",
+	"version": "1.6.0",
 	"type": "library",
 	"description": "Create a slideshow from your gallery images in Wordpress",
 	"keywords": ["ui","slideshow","component","makesites"],
