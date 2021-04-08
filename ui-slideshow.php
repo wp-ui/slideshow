@@ -202,8 +202,8 @@ class WP_UI_Slideshow {
 	}
 
 	function sessionStart() {
-		if(!session_id()) {
-			session_start();
+		if (!isset($_SESSION)) { // OLD condition: (!session_id())
+			session_start(['read_and_close' => true]);
 		}
 		// reset error
 		unset( $_SESSION['ui_slideshow_error'] );
